@@ -2,12 +2,10 @@ package com.study.restapi.controller;
 
 import com.study.restapi.controller.dto.ProductDto;
 import com.study.restapi.model.Product;
-import com.study.restapi.repository.ProductRepository;
+import com.study.restapi.services.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -15,25 +13,25 @@ import java.util.List;
 @RequestMapping("/product")
 public class ProductController {
 
-    private final ProductRepository productRepository;
+    private ProductService productService;
 
-    public ProductController(ProductRepository productRepository) {
-        this.productRepository = productRepository;
+    public ProductController(ProductService productService) {
+        this.productService = productService;
     }
 
     @GetMapping
     List<Product> getAllProducts() {
-        return productRepository.findAll();
+        return productService.listProducts();
     }
 
     @GetMapping("/{id}")
     Product getProductById(@PathVariable long id) {
-        return findProductById(id);
+        return productService.getProduct(id);
     }
 
     @PostMapping
     ResponseEntity<Product> addProduct(@RequestBody ProductDto productDto) {
-        final var productSaved = productRepository.save(productDto.toEntity());
+        final var productSaved = productService.createProduct(productDto);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -42,28 +40,11 @@ public class ProductController {
 
     @PutMapping("/{id}")
     Product updateProduct(@PathVariable long id, @RequestBody ProductDto productDto) {
-        Product product = findProductById(id);
-
-        product.setName(productDto.getName());
-        product.setDescription(productDto.getDescription());
-        product.setBrand(productDto.getBrand());
-        product.setDepartment(productDto.getDepartment());
-
-        return productRepository.save(product);
+        return productService.updateProduct(id, productDto);
     }
 
     @DeleteMapping("/{id}")
     void deleteProduct(@PathVariable long id) {
-        findProductById(id);
-
-        productRepository.deleteById(id);
+        productService.removeProduct(id);
     }
-
-    private Product findProductById(long id) {
-        return productRepository
-                .findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Product not found"));
-    }
-
 }

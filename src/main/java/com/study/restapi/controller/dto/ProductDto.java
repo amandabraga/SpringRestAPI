@@ -9,6 +9,13 @@ public class ProductDto {
     private String brand;
     private String department;
 
+    public ProductDto(String name, String description, String brand, String department) {
+        this.name = name;
+        this.description = description;
+        this.brand = brand;
+        this.department = department;
+    }
+
     public String getName() {
         return name;
     }
