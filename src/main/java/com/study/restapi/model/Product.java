@@ -26,7 +26,7 @@ public class Product {
         this.department = department;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
